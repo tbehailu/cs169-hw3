@@ -1,52 +1,32 @@
 Rails Intro: Add Features to RottenPotatoes
 ===========================================
 
-In this homework you will add features to the RottenPotatoes teaching
-app and deploy the enhanced app on Heroku.  We will run
+In this homework you will add features to the RottenPotatoes teaching app and deploy the enhanced app on Heroku.  We will run
 live integration tests against your deployed version.
 
-You will add two features  to the  RottenPotatoes "List All Movies" page
-that will familiarize you 
-with the interactions between controllers and views:
+You will add two features  to the  RottenPotatoes "List All Movies" page that will familiarize you with the interactions between controllers and views:
 
 0. Allow movies to be sorted by either title or release date;
 
 0. Filter the list so only movies with certain ratings (PG, G, etc.) are
 shown. 
 
-General advice:  This homework involves modifying RottenPotatoes in
-various ways.  Git is your friend: commit frequently in case you
-inadvertently break something that was working before!  That way you can
-always back up to an earlier revision, or just visually compare what
-changed in each file since your last "good" commit. 
+General advice:  This homework involves modifying RottenPotatoes in various ways.  Git is your friend: commit frequently in case you inadvertently break something that was working before!  That way you can always back up to an earlier revision, or just visually compare what changed in each file since your last "good" commit. 
 
 *Remember, commit early and often!*
 
 # Part 1: get RottenPotatoes running locally and on Heroku
 
-**Goal:** Create a new Rails app for RottenPotatoes, populate it with
-our starter code, and get it running locally as well as on Heroku.
+**Goal:** Create a new Rails app for RottenPotatoes, populate it with our starter code, and get it running locally as well as on Heroku.
 
-The provided skeleton code is **not** a complete and ready-to-run Rails
-app: we want you to get used to the process of bootstrapping a new app
-from scratch.  You may find yourself looking up the specific commands
-and options to do some of the following steps; that's part of the
-retention process.
+The provided skeleton code is **not** a complete and ready-to-run Rails app: we want you to get used to the process of bootstrapping a new app from scratch.  You may find yourself looking up the specific commands and options to do some of the following steps; that's part of the retention process.
 
-0. Create a brand-new Rails app called `rottenpotatoes` (you can choose a
-different name, but the provided skeleton code won't work
-out-of-the-box).  You should now have a `rottenpotatoes` directory,
-which is the "app root directory" in Rails parlance.  **Hint:** To
-create a brand-new Rails app, you don't need to create all its files
-from scratch.  "Use the Google" to figure out how Rails itself can
-create the "skeleton" of a new app for you.
+0. Create a brand-new Rails app called `rottenpotatoes` (you can choose a different name, but the provided skeleton code won't work
+out-of-the-box).  You should now have a `rottenpotatoes` directory, which is the "app root directory" in Rails parlance.  **Hint:** To create a brand-new Rails app, you don't need to create all its files from scratch.  "Use the Google" to figure out how Rails itself can create the "skeleton" of a new app for you.
 
-0. Put that directory immediately under Git version control, and add all
-the files in it.  Commit.
+0. Put that directory immediately under Git version control, and add all the files in it.  Commit.
 
-0. Replace the following specific files under `rottenpotatoes` with
-their counterparts from the provided
-`rottenpotatoes` starter code directory:
+0. Replace the following specific files under `rottenpotatoes` with their counterparts from the provided `rottenpotatoes` starter code directory:
 
 * Gemfile
 * app/assets/stylesheets/application.css
@@ -63,13 +43,7 @@ their counterparts from the provided
 
 Commit the new versions of these files.
 
-* Self-check: the `Gemfile` specifies what libraries (gems) this app
-will use, and some constraints on the compatible versions of gems.  How
-do you actually cause the gems to be installed (or have the
-versions checked for compatibility, if you already have the gems
-installed), and what file is created to record the definitive versions
-of gems that will actually be used at runtime?  (Check your answer
-before proceeding, to avoid an installation pitfall!)
+* Self-check: the `Gemfile` specifies what libraries (gems) this app will use, and some constraints on the compatible versions of gems.  How do you actually cause the gems to be installed (or have the versions checked for compatibility, if you already have the gems installed), and what file is created to record the definitive versions of gems that will actually be used at runtime?  (Check your answer before proceeding, to avoid an installation pitfall!)
  
 > Run `bundle install --without production`, which creates
 > `Gemfile.lock`.  The reason for `--without production` is to avoid
@@ -79,36 +53,24 @@ before proceeding, to avoid an installation pitfall!)
 > already have a full installation of Postgres itself!  We don't need it
 > locally because we use the `sqlite3` database for development.
 
-0. The app won't run yet because no routes mapping URIs to controller
-actions have been defined, and no database has been created.  For this
-app, all we need are the four basic 
-CRUD routes for `Movie` resources.  What file do you need to modify to
-add these routes, and what single line can you add that will set up all
-the basic CRUD-for-a-resource routes?
+0. The app won't run yet because no routes mapping URIs to controller actions have been defined, and no database has been created.  For this app, all we need are the four basic 
+CRUD routes for `Movie` resources.  What file do you need to modify to add these routes, and what single line can you add that will set up all the basic CRUD-for-a-resource routes?
 
 > Add the line `resources :movies` to `config/routes.rb`.  Go ahead, do it.
 
-At this point, run `rake routes` to verify you have basic RESTful routes
-for the movies model.
+At this point, run `rake routes` to verify you have basic RESTful routes for the movies model.
 
-0. The app still won't run because we haven't created a database.  (We
-don't mean that the database has no movies in it, though that also
-happens to be true: we mean there is no database at all!)  In other
-words, we have not run the initial migration to create the schema.
+0. The app still won't run because we haven't created a database.  (We don't mean that the database has no movies in it, though that also happens to be true: we mean there is no database at all!)  In other words, we have not run the initial migration to create the schema.
 
-* What command should we use to cause Rails to generate a migration
-file for us that will add the columns
+* What command should we use to cause Rails to generate a migration file for us that will add the columns
 title (string), release date (datetime), rating (string), and
 description (text) to a table called `movies`?
 
 > `rails generate migration AddFieldsToMovies title:string release_date:datetime rating:string description:text`
 
-Take a look at the migration file that was created.  The `change` method
-defines what happens when the migration is applied.
+Take a look at the migration file that was created.  The `change` method defines what happens when the migration is applied.
 
-* Why will this migration **fail** if applied right now, and how should
-you fix it?  (Hint: what
-assumption does the `change` code appear to make about the database schema?)
+* Why will this migration **fail** if applied right now, and how should you fix it?  (Hint: what assumption does the `change` code appear to make about the database schema?)
 
 > The `change` method assumes the `movies` table already exists, and adds
 > columns to it.  One fix is to add `create_table :movies` (or
@@ -116,9 +78,7 @@ assumption does the `change` code appear to make about the database schema?)
 
 Apply the fix and then run the migration (hint: `rake` is involved).
 
-At this point you should be able to run the app locally with `rails
-server` and ensure you can visit 
-`localhost:3000` in a browser.
+At this point you should be able to run the app locally with `rails server` and ensure you can visit `localhost:3000` in a browser.
 
 0. Deploy the app to Heroku (review the procedure in the ESaaS Appendix if
 necessary). Here's a brief overview of the workflow:
