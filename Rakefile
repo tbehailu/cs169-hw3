@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-Hangperson::Application.load_tasks
+Rottenpotatoes::Application.load_tasks
