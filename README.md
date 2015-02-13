@@ -80,26 +80,21 @@ Apply the fix and then run the migration (hint: `rake` is involved).
 
 At this point you should be able to run the app locally with `rails server` and ensure you can visit `localhost:3000` in a browser.
 
-0. Deploy the app to Heroku (review the procedure in the ESaaS Appendix if
-necessary). Here's a brief overview of the workflow:
+0. Deploy the app to Heroku (review the procedure in the ESaaS Appendix if necessary). Here's a brief overview of the workflow:
   - Start by creating a new Heorku app and configuring your rottenpotatoes git repository to have a Heroku remote
   - Heroku is going to require that you have a database ready and waiting when you push your code, else the deploy will fail.  A Heroku PostgreSQL database can be created for your app by running `heroku addons:add heroku-postgresql`.
   - Go ahead and deploy your app with the proper git push command
   - At this point, visiting the '/movies' route will still fail.  This is because you have a DB stood up, but it does not have the most up-to-date schema instantiated for your app (in fact, there is no schema at all since we _just_ made the DB).  We can run all of our DB migrations on our Heroku deployed app by running `heroku run rake db:migrate`.  This is the same as a local `rake db:migrate` except that it runs it on your cloud-deployed Heroku app.
   - Optionally, you can run `heroku run rake db:seed` to populate some dummy movie entries
 
-0. Verify you can visit the app as deployed on Heroku. You should be able to browse to the '/movies' route and click around without issues.  This is your
-starting point.  Get to this point before continuing, or you'll be in a
-world of pain.  **A world of pain.**
+0. Verify you can visit the app as deployed on Heroku. You should be able to browse to the '/movies' route and click around without issues.  This is your starting point.  Get to this point before continuing, or you'll be in a world of pain.  **A world of pain.**
 
 # Add a feature: sort the list of all movies
 
 **Goal:** Make it possible to sort the list of all movies either
 alphabetically by title or in order by release date.  
 
-Specifically, on the List All Movies page, you'll make two changes to the column
-headings for 'Movie Title' and 'Release Date' and the associated
-controller logic:
+Specifically, on the List All Movies page, you'll make two changes to the column headings for 'Movie Title' and 'Release Date' and the associated controller logic:
 
 0. The Movie Title and Release Date column headings will become
 clickable links. 
