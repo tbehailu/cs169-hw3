@@ -7,7 +7,8 @@ class MoviesController < ApplicationController
   end
 
   def index
-    sort_var = params[:sort_by]
+    @all_ratings = Movie.uniq.pluck(:rating)
+    sort_var = params[:sort_by]    
     if (!sort_var.nil?)
       if (sort_var == "title")
         @movies = Movie.order(:title)
@@ -16,6 +17,12 @@ class MoviesController < ApplicationController
       end
     else
       @movies = Movie.all
+    end
+    ratings = params[:ratings]
+    if !ratings.nil?
+      ratings = ratings.keys()
+      # print "**********ratings = ", params[:ratings].keys()
+      @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings])
     end
   end
 
