@@ -6,35 +6,65 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
-  def index
-    @all_ratings = Movie.uniq.pluck(:rating)
-    sort_var = params[:sort_by] 
+
+  def get_checked_ratings()
+    # mark all ratings as selected
     @ratings_checked = {}  
     @all_ratings.each do |rating|
       @ratings_checked[rating] = true
     end
-    ratings = params[:ratings]
+    return @ratings_checked
+  end
 
-    # if (!sort_var.nil?)
-    #   @movies = Movie.order(sort_var)
-    # else
-    #   @movies = Movie.all
-    # end
-    if !ratings.nil?
-      ratings = ratings.keys()
+  def get_ratings()
+    @ratings = params[:ratings]
+    @ratings_checked = {} 
+    # if we have ratings selected, get them and set the others as unselected
+    if !@ratings.nil?
+      @ratings = @ratings.keys()
+      session[:ratings] = @ratings
       @all_ratings.each do |r|
-        if (!ratings.include? r)
+        if (!@ratings.include? r)
           @ratings_checked[r] = false
+        else
+          @ratings_checked[r] = true
         end
       end
+      session[:ratings_checked] = @ratings_checked
     else
-      ratings = @all_ratings
+      @ratings = @all_ratings
     end
-    print "*** ratings checked = ", @ratings_checked
-    if(!sort_var.nil?)
-      @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings], :order => sort_var)
+    return @ratings
+  end
+
+  def index
+    @all_ratings = Movie.uniq.pluck(:rating)
+    # get_checked_ratings()
+    get_ratings()
+
+    session[:sort_var] = (params[:sort_by] != nil ? params[:sort_by] : session[:sort_var])
+    # session[:ratings_checked] = (session[:ratings_checked] == nil ? @ratings_checked : session[:ratings_checked])
+    # session[:ratings] = (@ratings.nil? != nil ? @ratings : session[:ratings])
+
+    # sort_var = params[:sort_by] 
+    
+
+    puts "*** ratings checked = ", @ratings_checked
+    puts "*** params = ", params
+    puts "**** session = ", session
+    puts "***** ratings = ", @ratings
+    puts "******** session[:ratings] = ", session[:ratings]
+    # session.clear
+    # session[:ratings] = nil
+    # session[:ratings_checked] = nil
+    # session[:sort_var] = nil
+
+    if(!session[:sort_var].nil?)
+      # @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings], :order => sort_var)
+      @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]], :order => session[:sort_var])
     else
-      @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings])
+      # @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings])
+      @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]])
     end
 
   end
