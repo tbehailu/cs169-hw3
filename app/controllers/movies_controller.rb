@@ -71,7 +71,7 @@ class MoviesController < ApplicationController
 
     if (@redirect)
       flash.keep
-      # redirect_to movies_path(params)
+      redirect_to movies_path(params)
     end
   end
 
