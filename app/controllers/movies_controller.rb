@@ -12,6 +12,7 @@ class MoviesController < ApplicationController
     # if we have ratings selected, get them and set the others as unselected
     if !@ratings.nil?
       session[:original_ratings] = @ratings
+      puts "**** original ratings = ", @ratings
       @ratings = @ratings.keys()
       session[:ratings] = @ratings
     else
@@ -20,9 +21,10 @@ class MoviesController < ApplicationController
         session[:ratings] = @ratings
       else
         @ratings = session[:ratings]
+        # params[:ratings] = session[:original_ratings]
+        @redirect_hash[:ratings] = session[:original_ratings]
+        # @redirect = true
       end
-      params[:ratings] = session[:original_ratings]
-      @redirect = true
     end
 
     @all_ratings.each do |r|
@@ -38,12 +40,14 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.uniq.pluck(:rating)
     @redirect = false
+    @redirect_hash = {}
     get_ratings()
 
     if (!params[:sort_by].nil?)
       session[:sort_var] = params[:sort_by]
     else
-      params[:sort_by] = session[:sort_var]
+      # params[:sort_by] = session[:sort_var]
+      @redirect_hash[:sort_by] = session[:sort_var]
       @redirect = true
     end
 
@@ -71,7 +75,7 @@ class MoviesController < ApplicationController
 
     if (@redirect)
       flash.keep
-      redirect_to movies_path(params)
+      redirect_to movies_path(@redirect_hash)
     end
   end
 
