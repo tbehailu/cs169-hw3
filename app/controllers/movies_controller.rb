@@ -48,7 +48,9 @@ class MoviesController < ApplicationController
     else
       # params[:sort_by] = session[:sort_var]
       @redirect_hash[:sort_by] = session[:sort_var]
-      @redirect = true
+      if (!session[:sort_var].nil?)
+        @redirect = true
+      end
     end
 
     # session.clear
