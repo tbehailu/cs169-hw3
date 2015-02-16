@@ -6,16 +6,6 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
-
-  def get_checked_ratings()
-    # mark all ratings as selected
-    @ratings_checked = {}  
-    @all_ratings.each do |rating|
-      @ratings_checked[rating] = true
-    end
-    return @ratings_checked
-  end
-
   def get_ratings()
     @ratings = params[:ratings]
     @ratings_checked = {} 
@@ -23,18 +13,20 @@ class MoviesController < ApplicationController
     if !@ratings.nil?
       @ratings = @ratings.keys()
       session[:ratings] = @ratings
-      @all_ratings.each do |r|
-        if (!@ratings.include? r)
-          @ratings_checked[r] = false
-        else
-          @ratings_checked[r] = true
-        end
-      end
       session[:ratings_checked] = @ratings_checked
     else
+      if session[:ratings].nil?
+        session[:ratings] = @all_ratings
+      end
       @ratings = @all_ratings
     end
-    return @ratings
+    @all_ratings.each do |r|
+      if (!@ratings.include? r)
+        @ratings_checked[r] = false
+      else
+        @ratings_checked[r] = true
+      end
+    end
   end
 
   def index
@@ -61,8 +53,10 @@ class MoviesController < ApplicationController
 
     if(!session[:sort_var].nil?)
       # @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings], :order => sort_var)
+      @sort_var = session[:sort_var]
       @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]], :order => session[:sort_var])
     else
+      @sort_var = nil
       # @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings])
       @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]])
     end
