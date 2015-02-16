@@ -8,8 +8,13 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.uniq.pluck(:rating)
-    sort_var = params[:sort_by]    
+    sort_var = params[:sort_by] 
+    @ratings_checked = {}  
+    @all_ratings.each do |rating|
+      @ratings_checked[rating] = true
+    end
     ratings = params[:ratings]
+
     # if (!sort_var.nil?)
     #   @movies = Movie.order(sort_var)
     # else
@@ -17,10 +22,15 @@ class MoviesController < ApplicationController
     # end
     if !ratings.nil?
       ratings = ratings.keys()
+      @all_ratings.each do |r|
+        if (!ratings.include? r)
+          @ratings_checked[r] = false
+        end
+      end
     else
       ratings = @all_ratings
     end
-
+    print "*** ratings checked = ", @ratings_checked
     if(!sort_var.nil?)
       @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings], :order => sort_var)
     else
