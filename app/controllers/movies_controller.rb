@@ -11,15 +11,20 @@ class MoviesController < ApplicationController
     @ratings_checked = {} 
     # if we have ratings selected, get them and set the others as unselected
     if !@ratings.nil?
+      session[:original_ratings] = @ratings
       @ratings = @ratings.keys()
       session[:ratings] = @ratings
-      session[:ratings_checked] = @ratings_checked
     else
-      if session[:ratings].nil?
-        session[:ratings] = @all_ratings
-      end
       @ratings = @all_ratings
+      if session[:ratings].nil?
+        session[:ratings] = @ratings
+      else
+        @ratings = session[:ratings]
+      end
+      params[:ratings] = session[:original_ratings]
+      @redirect = true
     end
+
     @all_ratings.each do |r|
       if (!@ratings.include? r)
         @ratings_checked[r] = false
@@ -27,25 +32,28 @@ class MoviesController < ApplicationController
         @ratings_checked[r] = true
       end
     end
+    session[:ratings_checked] = @ratings_checked
   end
 
   def index
     @all_ratings = Movie.uniq.pluck(:rating)
-    # get_checked_ratings()
+    @redirect = false
     get_ratings()
 
-    session[:sort_var] = (params[:sort_by] != nil ? params[:sort_by] : session[:sort_var])
-    # session[:ratings_checked] = (session[:ratings_checked] == nil ? @ratings_checked : session[:ratings_checked])
-    # session[:ratings] = (@ratings.nil? != nil ? @ratings : session[:ratings])
+    if (!params[:sort_by].nil?)
+      session[:sort_var] = params[:sort_by]
+    else
+      params[:sort_by] = session[:sort_var]
+      @redirect = true
+    end
 
-    # sort_var = params[:sort_by] 
-    
+    # session.clear
 
-    puts "*** ratings checked = ", @ratings_checked
-    puts "*** params = ", params
+    puts "**** ratings checked = ", @ratings_checked
+    puts "**** params = ", params
     puts "**** session = ", session
-    puts "***** ratings = ", @ratings
-    puts "******** session[:ratings] = ", session[:ratings]
+    puts "**** ratings = ", @ratings
+    puts "**** session[:ratings] = ", session[:ratings]
     # session.clear
     # session[:ratings] = nil
     # session[:ratings_checked] = nil
@@ -61,6 +69,10 @@ class MoviesController < ApplicationController
       @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]])
     end
 
+    if (@redirect)
+      flash.keep
+      # redirect_to movies_path(params)
+    end
   end
 
   def new
