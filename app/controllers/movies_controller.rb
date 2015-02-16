@@ -9,21 +9,24 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.uniq.pluck(:rating)
     sort_var = params[:sort_by]    
-    if (!sort_var.nil?)
-      if (sort_var == "title")
-        @movies = Movie.order(:title)
-      else
-        @movies = Movie.order(:release_date)
-      end
-    else
-      @movies = Movie.all
-    end
     ratings = params[:ratings]
+    # if (!sort_var.nil?)
+    #   @movies = Movie.order(sort_var)
+    # else
+    #   @movies = Movie.all
+    # end
     if !ratings.nil?
       ratings = ratings.keys()
-      # print "**********ratings = ", params[:ratings].keys()
+    else
+      ratings = @all_ratings
+    end
+
+    if(!sort_var.nil?)
+      @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings], :order => sort_var)
+    else
       @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings])
     end
+
   end
 
   def new
