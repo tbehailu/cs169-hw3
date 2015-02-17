@@ -11,22 +11,33 @@ class MoviesController < ApplicationController
     @ratings_checked = {} 
     # if we have ratings selected, get them and set the others as unselected
     if !@ratings.nil?
-      session[:original_ratings] = @ratings
       puts "**** original ratings = ", @ratings
-      @ratings = @ratings.keys()
-      session[:ratings] = @ratings
-    else
-      @ratings = @all_ratings
-      if session[:ratings].nil?
-        session[:ratings] = @ratings
-      else
-        @ratings = session[:ratings]
-        # params[:ratings] = session[:original_ratings]
-        @redirect_hash[:ratings] = session[:original_ratings]
-        # @redirect = true
+      puts "**** original session =", session
+      if (!@ratings.kind_of? Array) # first time
+        # session[:original_ratings] = @ratings
+        @ratings = @ratings.keys()
       end
+      session[:ratings] = @ratings
+      check_ratings()
+    else
+      # @ratings = @all_ratings
+      if session[:ratings].nil?
+        session[:ratings] = @all_ratings
+      end
+      # else # use ratings stored in sessions hash
+        # @ratings = session[:ratings]
+        # params[:ratings] = session[:ratings]
+      @redirect_hash[:ratings] = session[:ratings]
+      params[:ratings] = session[:ratings]
+      # if (!session[:ratings].nil?)
+      # @redirect = true
+      @redirect = true
+        # end
+      # end
     end
+  end
 
+  def check_ratings()
     @all_ratings.each do |r|
       if (!@ratings.include? r)
         @ratings_checked[r] = false
@@ -38,22 +49,35 @@ class MoviesController < ApplicationController
   end
 
   def index
+    # session.delete(:sort_var)
+    # session.delete(:ratings)
     @all_ratings = Movie.uniq.pluck(:rating)
     @redirect = false
     @redirect_hash = {}
+
     get_ratings()
 
-    if (!params[:sort_by].nil?)
-      session[:sort_var] = params[:sort_by]
+    if (!params[:sort_var].nil?)
+      session[:sort_var] = params[:sort_var]
+      @sort_var = session[:sort_var]
+      @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]], :order => session[:sort_var])
     else
-      # params[:sort_by] = session[:sort_var]
-      @redirect_hash[:sort_by] = session[:sort_var]
-      if (!session[:sort_var].nil?)
+      # params[:sort_var] = session[:sort_var]
+      if !session[:sort_var].nil?
+        @redirect_hash[:sort_var] = session[:sort_var]
+        params[:sort_var] = session[:sort_var]
         @redirect = true
+      else
+        @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]])
       end
     end
 
-    # session.clear
+    if @redirect
+      flash.keep
+      redirect_to movies_path(params)
+      return
+    end
+
 
     puts "**** ratings checked = ", @ratings_checked
     puts "**** params = ", params
@@ -65,24 +89,25 @@ class MoviesController < ApplicationController
     # session[:ratings_checked] = nil
     # session[:sort_var] = nil
 
-    if(!session[:sort_var].nil?)
-      # @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings], :order => sort_var)
-      @sort_var = session[:sort_var]
-      @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]], :order => session[:sort_var])
-    else
-      @sort_var = nil
-      # @movies = Movie.find(:all, :conditions => ["rating IN (?)", ratings])
-      @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]])
-    end
+    # if(!session[:sort_var].nil?)
+    #   @sort_var = session[:sort_var]
+    #   @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]], :order => session[:sort_var])
+    # else
+    #   @sort_var = nil
+    #   @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]])
+    # end
 
-    if (@redirect)
-      flash.keep
-      redirect_to movies_path(@redirect_hash)
-    end
+    # if (@redirect)
+    # if (@redirect)
+
+    #   flash.keep
+    #   redirect_to movies_path(@redirect_hash)
+    # end
   end
 
   def new
     # default: render 'new' template
+    # session.clear
   end
 
   def create
