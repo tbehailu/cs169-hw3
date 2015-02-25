@@ -11,8 +11,6 @@ class MoviesController < ApplicationController
     @ratings_checked = {} 
     # if we have ratings selected, get them and set the others as unselected
     if !@ratings.nil?
-      puts "**** original ratings = ", @ratings
-      puts "**** original session =", session
       if (!@ratings.kind_of? Array) # first time
         # session[:original_ratings] = @ratings
         @ratings = @ratings.keys()
@@ -20,20 +18,15 @@ class MoviesController < ApplicationController
       session[:ratings] = @ratings
       check_ratings()
     else
-      # @ratings = @all_ratings
+
       if session[:ratings].nil?
         session[:ratings] = @all_ratings
       end
-      # else # use ratings stored in sessions hash
-        # @ratings = session[:ratings]
-        # params[:ratings] = session[:ratings]
+
       @redirect_hash[:ratings] = session[:ratings]
       params[:ratings] = session[:ratings]
-      # if (!session[:ratings].nil?)
-      # @redirect = true
       @redirect = true
-        # end
-      # end
+
     end
   end
 
@@ -79,35 +72,19 @@ class MoviesController < ApplicationController
     end
 
 
-    puts "**** ratings checked = ", @ratings_checked
-    puts "**** params = ", params
-    puts "**** session = ", session
-    puts "**** ratings = ", @ratings
-    puts "**** session[:ratings] = ", session[:ratings]
+    # puts "**** ratings checked = ", @ratings_checked
+    # puts "**** params = ", params
+    # puts "**** session = ", session
+    # puts "**** ratings = ", @ratings
+    # puts "**** session[:ratings] = ", session[:ratings]
     # session.clear
     # session[:ratings] = nil
     # session[:ratings_checked] = nil
     # session[:sort_var] = nil
-
-    # if(!session[:sort_var].nil?)
-    #   @sort_var = session[:sort_var]
-    #   @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]], :order => session[:sort_var])
-    # else
-    #   @sort_var = nil
-    #   @movies = Movie.find(:all, :conditions => ["rating IN (?)", session[:ratings]])
-    # end
-
-    # if (@redirect)
-    # if (@redirect)
-
-    #   flash.keep
-    #   redirect_to movies_path(@redirect_hash)
-    # end
   end
 
   def new
     # default: render 'new' template
-    # session.clear
   end
 
   def create
