@@ -10,6 +10,8 @@ group :development, :test do
   gem 'cucumber-rails', :require => false
   gem 'database_cleaner'
 
+  gem 'rspec-rails','~2.14.0'
+  gem 'simplecov'
 end
 
 
@@ -19,6 +21,10 @@ end
 
 group :assets do
   gem 'uglifier'
+
+  gem 'therubyracer'
+  gem 'sass-rails'
+  gem 'coffee-rails'
 end
 
 gem 'jquery-rails'
